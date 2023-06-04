@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crud/services/alert_dialog.dart';
+import 'package:firebase_crud/widgets/alert_dialog.dart';
 import 'package:flutter/material.dart';
 
 class TodoProvider with ChangeNotifier {
