@@ -32,35 +32,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final auth = Provider.of<AuthProvider>(context);
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text('Profile'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 60,
-              child: Icon(Icons.person, size: 100),
-            ),
-            SizedBox(height: 20),
-            Text(
-              _userName,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                auth.signOut();
-              },
-              child: Text('Logout'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Implement donate functionality
-              },
-              child: Text('Donate'),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 60,
+                child: FlutterLogo(
+                  size: 80,
+                ),
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+              SizedBox(height: 20),
+              Text(
+                _userName,
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+              Card(
+                child: ListTile(
+                  title: Text("Donate"),
+                  trailing: Icon(Icons.health_and_safety),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  title: Text("Contact Us"),
+                  trailing: Icon(Icons.contact_mail),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  title: Text('Logout'),
+                  trailing: Icon(Icons.logout),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

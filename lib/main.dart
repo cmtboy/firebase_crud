@@ -1,4 +1,3 @@
-import 'package:connection_notifier/connection_notifier.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crud/firebase_options.dart';
 import 'package:firebase_crud/providers/auth_provider.dart';

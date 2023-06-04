@@ -15,6 +15,7 @@ class TodoListScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Todo List'),
       ),
       body: Provider.of<TodoProvider>(context).isLoading
@@ -64,38 +65,61 @@ class TodoListScreen extends StatelessWidget {
             final description = task['description'] ?? '';
             final isCompleted = task['isCompleted'] ?? false;
 
-            return ListTile(
-              title: Text(
-                title,
-                style: TextStyle(
-                  color: isCompleted ? Colors.green : Colors.black,
-                  decoration: isCompleted
-                      ? TextDecoration.lineThrough
-                      : TextDecoration.none,
-                ),
-              ),
-              subtitle: Text(description),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () {
-                  todoProvider.deleteTask(uid, task.id, context);
-                },
-              ),
-              leading: Checkbox(
-                value: isCompleted,
-                onChanged: (value) {
-                  todoProvider.updateTaskCompletion(
-                      uid, task.id, value ?? false, context);
-                },
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => EditTaskScreen(task: task),
+            return Card(
+              child: ListTile(
+                title: Text(
+                  title,
+                  style: TextStyle(
+                    color: isCompleted ? Colors.green : Colors.black,
+                    decoration: isCompleted
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
                   ),
-                );
-              },
+                ),
+                subtitle: Text(description),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text("Delete Task"),
+                        content: Text("You want to delete this task?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text('NO'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              todoProvider.deleteTask(uid, task.id, context);
+                              Navigator.pop(context);
+                            },
+                            child: Text("Yes"),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                leading: Checkbox(
+                  value: isCompleted,
+                  onChanged: (value) {
+                    todoProvider.updateTaskCompletion(
+                        uid, task.id, value ?? false, context);
+                  },
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EditTaskScreen(task: task),
+                    ),
+                  );
+                },
+              ),
             );
           },
         );

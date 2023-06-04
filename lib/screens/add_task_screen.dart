@@ -41,7 +41,7 @@ class AddTaskScreen extends StatelessWidget {
                 if (title.isNotEmpty) {
                   final todoProvider =
                       Provider.of<TodoProvider>(context, listen: false);
-                  todoProvider.addTask(title, description);
+                  todoProvider.addTask(title, description, context);
 
                   Navigator.pop(context);
                 }
