@@ -1,5 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crud/services/alert_dialog.dart';
 import 'package:firebase_crud/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -39,15 +42,22 @@ class AuthProvider with ChangeNotifier {
           .set({'name': name});
 
       notifyListeners();
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => MyBottomNavBar()));
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const MyBottomNavBar()));
     } catch (e) {
-      // Handle signup error
-      print('Signup error: $e');
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialogWidget(
+                text: e.toString(),
+                context: context,
+              ));
     }
   }
 
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login(
+      {required String email,
+      required String password,
+      required BuildContext context}) async {
     try {
       final UserCredential userCredential =
           await _firebaseAuth.signInWithEmailAndPassword(
@@ -55,11 +65,14 @@ class AuthProvider with ChangeNotifier {
         password: password,
       );
       _user = userCredential.user;
-      print('Login success');
       notifyListeners();
     } catch (e) {
-      // Handle login error
-      print('Login error: $e');
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialogWidget(
+                text: e.toString(),
+                context: context,
+              ));
     }
   }
 

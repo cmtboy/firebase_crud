@@ -78,14 +78,14 @@ class TodoListScreen extends StatelessWidget {
               trailing: IconButton(
                 icon: const Icon(Icons.delete),
                 onPressed: () {
-                  todoProvider.deleteTask(uid, task.id);
+                  todoProvider.deleteTask(uid, task.id, context);
                 },
               ),
               leading: Checkbox(
                 value: isCompleted,
                 onChanged: (value) {
                   todoProvider.updateTaskCompletion(
-                      uid, task.id, value ?? false);
+                      uid, task.id, value ?? false, context);
                 },
               ),
               onTap: () {

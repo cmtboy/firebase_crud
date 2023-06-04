@@ -60,7 +60,8 @@ class LoginScreenState extends State<LoginScreen> {
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  authProvider.login(email: email!, password: password!);
+                  authProvider.login(
+                      email: email!, password: password!, context: context);
                 }
               },
               child: const Text('Login'),

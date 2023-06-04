@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crud/services/alert_dialog.dart';
 import 'package:flutter/material.dart';
 
 class TodoProvider with ChangeNotifier {
   bool isLoading = true;
 
-  Future<void> addTask(String title, String description) async {
+  Future<void> addTask(
+      String title, String description, BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     final uid = user!.uid;
 
@@ -20,12 +22,17 @@ class TodoProvider with ChangeNotifier {
         'isCompleted': false,
       });
     } catch (error) {
-      print('Error adding task: $error');
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialogWidget(
+                text: error.toString(),
+                context: context,
+              ));
     }
   }
 
-  Future<void> updateTask(
-      String taskId, String title, String description) async {
+  Future<void> updateTask(String taskId, String title, String description,
+      BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     final uid = user!.uid;
 
@@ -40,12 +47,17 @@ class TodoProvider with ChangeNotifier {
         'description': description,
       });
     } catch (error) {
-      print('Error updating task: $error');
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialogWidget(
+                text: error.toString(),
+                context: context,
+              ));
     }
   }
 
-  Future<void> updateTaskCompletion(
-      String uids, String taskId, bool isCompleted) async {
+  Future<void> updateTaskCompletion(String uids, String taskId,
+      bool isCompleted, BuildContext context) async {
     final String uid = uids;
 
     try {
@@ -58,11 +70,17 @@ class TodoProvider with ChangeNotifier {
         'isCompleted': isCompleted,
       });
     } catch (error) {
-      print('Error updating task completion: $error');
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialogWidget(
+                text: error.toString(),
+                context: context,
+              ));
     }
   }
 
-  Future<void> deleteTask(String uids, String taskId) async {
+  Future<void> deleteTask(
+      String uids, String taskId, BuildContext context) async {
     final String uid = uids;
 
     try {
@@ -73,7 +91,12 @@ class TodoProvider with ChangeNotifier {
           .doc(taskId)
           .delete();
     } catch (error) {
-      print('Error deleting task: $error');
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialogWidget(
+                text: error.toString(),
+                context: context,
+              ));
     }
   }
 
