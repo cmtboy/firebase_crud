@@ -2,10 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crud/firebase_options.dart';
 import 'package:firebase_crud/providers/auth_provider.dart';
 import 'package:firebase_crud/providers/to_do_provider.dart';
+import 'package:firebase_crud/screens/login_screen.dart';
 import 'package:firebase_crud/screens/to_do_screen.dart';
+import 'package:firebase_crud/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,9 +34,9 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           home: Consumer<AuthProvider>(builder: (_, authProvider, __) {
             if (authProvider.isLoggedIn) {
-              return const TodoListScreen();
+              return MyBottomNavBar();
             } else {
-              return const LoginScreen();
+              return LoginScreen();
             }
           }),
         ));

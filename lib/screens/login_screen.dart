@@ -1,17 +1,16 @@
+import 'package:firebase_crud/providers/auth_provider.dart';
 import 'package:firebase_crud/screens/signup_screen.dart';
-import 'package:firebase_crud/screens/to_do_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _auth = FirebaseAuth.instance;
+class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
   String? email;
@@ -19,16 +18,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Form(
         key: _formKey,
         child: Column(
           children: [
             TextFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Email',
               ),
               onChanged: (value) {
@@ -42,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
             ),
             TextFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Password',
               ),
               onChanged: (value) {
@@ -59,28 +60,19 @@ class _LoginScreenState extends State<LoginScreen> {
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  _auth
-                      .signInWithEmailAndPassword(
-                          email: email!, password: password!)
-                      .then((user) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => TodoListScreen(),
-                      ),
-                    );
-                  }).catchError((error) {
-                    print(error);
-                  });
+                  authProvider.login(email: email!, password: password!);
                 }
               },
-              child: Text('Login'),
+              child: const Text('Login'),
             ),
             ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SignupScreen()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SignupScreen()));
                 },
-                child: Text('Signup'))
+                child: const Text('Signup'))
           ],
         ),
       ),

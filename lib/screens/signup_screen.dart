@@ -91,7 +91,10 @@ class SignupScreenState extends State<SignupScreen> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   authProvider.signUp(
-                      email: email!, password: password!, name: name!);
+                      context: context,
+                      email: email!,
+                      password: password!,
+                      name: name!);
                 }
               },
               child: const Text('Sign Up'),

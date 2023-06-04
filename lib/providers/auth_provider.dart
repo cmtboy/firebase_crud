@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_crud/widgets/bottom_nav_bar.dart';
+import 'package:flutter/material.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -22,7 +23,8 @@ class AuthProvider with ChangeNotifier {
   Future<void> signUp(
       {required String email,
       required String password,
-      required String name}) async {
+      required String name,
+      required BuildContext context}) async {
     try {
       final UserCredential userCredential =
           await _firebaseAuth.createUserWithEmailAndPassword(
@@ -37,6 +39,8 @@ class AuthProvider with ChangeNotifier {
           .set({'name': name});
 
       notifyListeners();
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => MyBottomNavBar()));
     } catch (e) {
       // Handle signup error
       print('Signup error: $e');
@@ -51,6 +55,7 @@ class AuthProvider with ChangeNotifier {
         password: password,
       );
       _user = userCredential.user;
+      print('Login success');
       notifyListeners();
     } catch (e) {
       // Handle login error
