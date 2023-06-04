@@ -1,16 +1,15 @@
-import 'package:firebase_crud/screens/to_do_screen.dart';
+import 'package:firebase_crud/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
   @override
-  _SignupScreenState createState() => _SignupScreenState();
+  SignupScreenState createState() => SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
-  final _auth = FirebaseAuth.instance;
+class SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
 
   String? name;
@@ -20,16 +19,18 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign Up'),
+        title: const Text('Sign Up'),
       ),
       body: Form(
         key: _formKey,
         child: Column(
           children: [
             TextFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Name',
               ),
               onChanged: (value) {
@@ -37,7 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
               },
             ),
             TextFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Email',
               ),
               onChanged: (value) {
@@ -51,7 +52,7 @@ class _SignupScreenState extends State<SignupScreen> {
               },
             ),
             TextFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Password',
               ),
               onChanged: (value) {
@@ -69,7 +70,7 @@ class _SignupScreenState extends State<SignupScreen> {
               obscureText: true,
             ),
             TextFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Confirm Password',
               ),
               onChanged: (value) {
@@ -89,25 +90,11 @@ class _SignupScreenState extends State<SignupScreen> {
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  _auth
-                      .createUserWithEmailAndPassword(
-                          email: email!, password: password!)
-                      .then((user) {
-                    FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(user.user!.uid)
-                        .set({'name': name});
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => TodoListScreen(),
-                      ),
-                    );
-                  }).catchError((error) {
-                    print(error);
-                  });
+                  authProvider.signUp(
+                      email: email!, password: password!, name: name!);
                 }
               },
-              child: Text('Sign Up'),
+              child: const Text('Sign Up'),
             ),
           ],
         ),

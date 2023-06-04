@@ -1,17 +1,24 @@
+import 'package:firebase_crud/providers/to_do_provider.dart';
+import 'package:firebase_crud/screens/add_task_screen.dart';
+import 'package:firebase_crud/screens/edit_task_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
 class TodoListScreen extends StatelessWidget {
+  const TodoListScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Todo List'),
+        title: const Text('Todo List'),
       ),
       body: Provider.of<TodoProvider>(context).isLoading
-          ? Center(child: CircularProgressIndicator())
-          : _buildTodoList(context),
+          ? const Center(child: CircularProgressIndicator())
+          : _buildTodoList(context, user!.uid),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -19,29 +26,33 @@ class TodoListScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => AddTaskScreen()),
           );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildTodoList(BuildContext context) {
+  Widget _buildTodoList(BuildContext context, String uid) {
     final todoProvider = Provider.of<TodoProvider>(context);
 
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('tasks').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('tasks')
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text('Error fetching tasks'));
+          return const Center(child: Text('Error fetching tasks'));
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         final tasks = snapshot.data?.docs ?? [];
 
         if (tasks.isEmpty) {
-          return Center(child: Text('No tasks found'));
+          return const Center(child: Text('No tasks found'));
         }
 
         return ListView.builder(
@@ -64,15 +75,16 @@ class TodoListScreen extends StatelessWidget {
               ),
               subtitle: Text(description),
               trailing: IconButton(
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () {
-                  todoProvider.deleteTask(task.id);
+                  todoProvider.deleteTask(uid, task.id);
                 },
               ),
               leading: Checkbox(
                 value: isCompleted,
                 onChanged: (value) {
-                  todoProvider.updateTaskCompletion(task.id, value ?? false);
+                  todoProvider.updateTaskCompletion(
+                      uid, task.id, value ?? false);
                 },
               ),
               onTap: () {
@@ -88,177 +100,5 @@ class TodoListScreen extends StatelessWidget {
         );
       },
     );
-  }
-}
-
-class AddTaskScreen extends StatelessWidget {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Task'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Title',
-              ),
-            ),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Description',
-              ),
-            ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                final title = titleController.text.trim();
-                final description = descriptionController.text.trim();
-
-                if (title.isNotEmpty) {
-                  final todoProvider =
-                      Provider.of<TodoProvider>(context, listen: false);
-                  todoProvider.addTask(title, description);
-
-                  Navigator.pop(context);
-                }
-              },
-              child: Text('Add Task'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class EditTaskScreen extends StatelessWidget {
-  final QueryDocumentSnapshot task;
-  final TextEditingController titleController;
-  final TextEditingController descriptionController;
-
-  EditTaskScreen({required this.task})
-      : titleController = TextEditingController(text: task['title']),
-        descriptionController =
-            TextEditingController(text: task['description']);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Task'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Title',
-              ),
-            ),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Description',
-              ),
-            ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                final title = titleController.text.trim();
-                final description = descriptionController.text.trim();
-
-                if (title.isNotEmpty) {
-                  final todoProvider =
-                      Provider.of<TodoProvider>(context, listen: false);
-                  todoProvider.updateTask(task.id, title, description);
-
-                  Navigator.pop(context);
-                }
-              },
-              child: Text('Save Changes'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class TodoProvider with ChangeNotifier {
-  bool isLoading = true;
-
-  Future<void> addTask(String title, String description) async {
-    try {
-      await FirebaseFirestore.instance.collection('tasks').add({
-        'title': title,
-        'description': description,
-        'isCompleted': false,
-      });
-    } catch (error) {
-      print('Error adding task: $error');
-    }
-  }
-
-  Future<void> updateTask(
-      String taskId, String title, String description) async {
-    try {
-      await FirebaseFirestore.instance.collection('tasks').doc(taskId).update({
-        'title': title,
-        'description': description,
-      });
-    } catch (error) {
-      print('Error updating task: $error');
-    }
-  }
-
-  Future<void> updateTaskCompletion(String taskId, bool isCompleted) async {
-    try {
-      await FirebaseFirestore.instance.collection('tasks').doc(taskId).update({
-        'isCompleted': isCompleted,
-      });
-    } catch (error) {
-      print('Error updating task completion: $error');
-    }
-  }
-
-  Future<void> deleteTask(String taskId) async {
-    try {
-      await FirebaseFirestore.instance.collection('tasks').doc(taskId).delete();
-    } catch (error) {
-      print('Error deleting task: $error');
-    }
-  }
-
-  void setLoading(bool value) {
-    isLoading = value;
-    notifyListeners();
-  }
-
-  void listenToTasks() {
-    FirebaseFirestore.instance
-        .collection('tasks')
-        .snapshots()
-        .listen((snapshot) {
-      setLoading(true);
-      // Delay the loading state to demonstrate the CircularProgressIndicator
-      Future.delayed(Duration(seconds: 2), () {
-        setLoading(false);
-      });
-    });
   }
 }
