@@ -2,10 +2,10 @@ import 'package:firebase_crud/screens/signup_screen.dart';
 import 'package:firebase_crud/screens/to_do_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       .then((user) {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                        builder: (context) => ToDoScreen(),
+                        builder: (context) => TodoListScreen(),
                       ),
                     );
                   }).catchError((error) {

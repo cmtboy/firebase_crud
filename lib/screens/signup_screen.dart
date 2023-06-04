@@ -99,7 +99,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         .set({'name': name});
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                        builder: (context) => ToDoScreen(),
+                        builder: (context) => TodoListScreen(),
                       ),
                     );
                   }).catchError((error) {

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crud/firebase_options.dart';
+import 'package:firebase_crud/screens/to_do_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/login_screen.dart';
@@ -17,11 +18,11 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      home: Provider(
-        create: (_) => Auth(),
-        child: LoginScreen(),
+    return ChangeNotifierProvider(
+      create: (context) => TodoProvider()..listenToTasks(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: TodoListScreen(),
       ),
     );
   }
