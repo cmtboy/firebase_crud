@@ -68,6 +68,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               Card(
                 child: ListTile(
+                  onTap: () {
+                    auth.signOut();
+                  },
                   title: Text('Logout'),
                   trailing: Icon(Icons.logout),
                 ),
